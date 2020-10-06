@@ -140,7 +140,55 @@ $ systemctl status pm2-USER
 | pm2 info **app_name** | Get information about a specific application using its App name|
 | pm2 monit | Displays the App status, CPU and Memory usage |
 
+### Installing Nginx
 
+First update the current packages and install nginx.
+```sh
+$ apt update
+$ apt install nginx
+```
+Then disable the default virtual host that comes pre-configured when Nginx is installed via Ubuntu's packet manager apt:
+```sh
+$ unlink /etc/nginx/sites-enabled/default
+```
+Then enter the sites-available directory and create a reverse proxy config file
+```sh
+$ cd /etc/nginx/sites-enabled/default
+$ sudo nano reverse-proxy.conf
+```
+Paste the following Nginx config into the text editor. The proxy server redirects all incomming connections on port 80 to the server, listening on port 3000. 
+```sh
+server {
+        listen 80;
+        listen [::]:80;
+
+        access_log /var/log/nginx/reverse-access.log;
+        error_log /var/log/nginx/reverse-error.log;
+
+        location / {
+                    proxy_pass http://127.0.0.1:3000;
+  }
+}
+```
+Save and exit the text editor.
+Now we need to copy the config file from /etc/nginx/sites-available to /etc/nginx/sites-enabled. The best way to do this is to use a symbolic link:
+```sh
+$ ln -s /etc/nginx/sites-available/reverse-proxy.conf /etc/nginx/sites-enabled/reverse-proxy.conf
+```
+Now we can test the configuration file using the following command:
+```sh
+nginx -t
+```
+This should return:
+```sh
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+```
+
+Now we have set up the reverse proxy and tested it to make sure that the config file is correct, we need to restart Nginx to have it apply the new proxy config file. To do this use the command to gracefully shutdown and restart it:
+```sh
+$ sudo systemctl reload nginx
+```
 
 ### Todos
 
