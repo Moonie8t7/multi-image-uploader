@@ -131,6 +131,16 @@ And check the status of the service using:
 $ systemctl status pm2-USER
 ```
 
+If you ever get an error message like:
+```sh
+Job for pm2-something failed because the service did not take the steps required by its unit configuration.
+See "systemctl status pm2-something" and "journalctl -xe" for details.
+```
+Issue the command:
+```sh
+$ sudo reboot
+```
+
 ### Other PM2 Commands
 | Command | What it does |
 | ----- | ----- |
